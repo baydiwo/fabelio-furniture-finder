@@ -36,7 +36,7 @@ const GlobalStyle = createGlobalStyle`
   }
   .title {
     font-weight: bold;
-    color: #fff;
+    color: #fff !important;
   }
   .site-card-wrapper {
     background: #ececec;
@@ -49,6 +49,9 @@ const GlobalStyle = createGlobalStyle`
     font-weight: bold;
     text-decoration: underline;
     text-align: right;
+  }
+  .description {
+    margin: 5px 0 0;
   }
 `;
 
