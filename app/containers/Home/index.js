@@ -17,7 +17,7 @@ import makeSelectHome from "./selectors";
 import reducer from "./reducer";
 import saga from "./saga";
 import messages from "./messages";
-import { fetchDetail } from "./actions";
+import { fetchDetail, fetchSearchQuery } from "./actions";
 import { Row, Col, Select, Divider, Card, Typography, Tag } from "antd";
 import "antd/dist/antd.css";
 import { CarOutlined } from "@ant-design/icons";
@@ -34,6 +34,8 @@ export function Home({ dispatch, home }) {
   const { styles, products } = home;
   const [productsData, setProductsData] = useState(products);
   const [deliveryTime, setDeliveryTime] = useState([]);
+  const [searchStyle, setSearchStyle] = useState([]);
+  const [searchDeliveryTime, setsearchDeliveryTime] = useState("");
 
   useEffect(() => {
     dispatch(fetchDetail());
@@ -62,10 +64,12 @@ export function Home({ dispatch, home }) {
         );
       });
       res = filtered;
+      dispatch(fetchSearchQuery(value, searchDeliveryTime));
+      setSearchStyle(value);
+      return setProductsData(res);
     } else {
       return setProductsData(products);
     }
-    return setProductsData(res);
   }
 
   function truncateString(str, num) {
@@ -96,6 +100,8 @@ export function Home({ dispatch, home }) {
       const filteredDays = products.filter(el => {
         return el.delivery_time.toString() === value.toString();
       });
+      dispatch(fetchSearchQuery(searchStyle, value));
+      setsearchDeliveryTime(value);
       return setProductsData(filteredDays);
     } else {
       return setProductsData(products);

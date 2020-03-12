@@ -8,7 +8,8 @@ import {
   DEFAULT_ACTION,
   FETCH_DETAIL,
   FETCH_DETAIL_SUCCESS,
-  FETCH_DETAIL_ERROR
+  FETCH_DETAIL_ERROR,
+  SEARCH_QUERY
 } from "./constants";
 
 export function defaultAction() {
@@ -35,5 +36,14 @@ export function fetchDetailError(error) {
   return {
     type: FETCH_DETAIL_ERROR,
     error
+  };
+}
+
+export function fetchSearchQuery(styleParam, deliveryTimeParam) {
+  console.log(styleParam, deliveryTimeParam, "query");
+  return {
+    type: SEARCH_QUERY,
+    styleParam,
+    deliveryTimeParam
   };
 }
