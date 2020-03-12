@@ -4,7 +4,7 @@
  *
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { FormattedMessage } from "react-intl";
@@ -31,22 +31,38 @@ export function Home({ dispatch, home }) {
   useInjectSaga({ key: "home", saga });
 
   const { styles, products } = home;
+  const [productsData, setProductsData] = useState(products);
 
   useEffect(() => {
     dispatch(fetchDetail());
   }, []);
 
-  console.log(home);
+  useEffect(() => {
+    setProductsData(products);
+  }, [products]);
 
-  const children = [];
-  for (let i = 10; i < 36; i++) {
-    children.push(
-      <Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>
-    );
+  function isEmpty(obj) {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) return false;
+    }
+    return true;
   }
 
   function handleChange(value) {
-    console.log(`selected ${value}`);
+    let res = [];
+    if (!isEmpty(value)) {
+      const filtered = products.filter(function(element) {
+        return (
+          element.furniture_style.filter(function(cat) {
+            return value.indexOf(cat) > -1;
+          }).length === value.length
+        );
+      });
+      res = filtered;
+    } else {
+      return setProductsData(products);
+    }
+    return setProductsData(res);
   }
 
   function truncateString(str, num) {
@@ -83,17 +99,21 @@ export function Home({ dispatch, home }) {
               <Select
                 mode="multiple"
                 style={{ width: "100%" }}
-                placeholder="Please select"
-                defaultValue={["a10", "c12"]}
+                placeholder="Classic, Midcentury"
                 onChange={handleChange}
               >
-                {children}
+                {styles &&
+                  styles.map(item => (
+                    <Option value={item} key={item}>
+                      {item}
+                    </Option>
+                  ))}
               </Select>
             </Col>
             <Col span={12}>
               <Select
                 defaultValue="lucy"
-                style={{ width: 120 }}
+                style={{ width: "100%" }}
                 onChange={handleChange}
               >
                 <Option value="jack">Jack</Option>
@@ -110,8 +130,8 @@ export function Home({ dispatch, home }) {
         {/* card */}
         <div className="site-card-wrapper">
           <Row gutter={16}>
-            {products &&
-              products.map((item, key) => (
+            {productsData &&
+              productsData.map((item, key) => (
                 <Col span={8} key={key}>
                   <Card
                     title={
@@ -131,11 +151,12 @@ export function Home({ dispatch, home }) {
                       {truncateString(item.description, 70)}
                     </div>
                     <div className="product-style">
-                      {item.furniture_style.map((s, k) => (
-                        <Tag color="gold" key={k}>
-                          {s}
-                        </Tag>
-                      ))}
+                      {item.furniture_style &&
+                        item.furniture_style.map((s, k) => (
+                          <Tag color="gold" key={k}>
+                            {s}
+                          </Tag>
+                        ))}
                     </div>
                     <div className="time">
                       <CarOutlined />

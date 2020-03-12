@@ -24,7 +24,6 @@ export function fetchDetail() {
 }
 
 export function fetchDetailSuccess(furniture_styles, products) {
-  console.log(furniture_styles, products, "actions");
   return {
     type: FETCH_DETAIL_SUCCESS,
     furniture_styles,
