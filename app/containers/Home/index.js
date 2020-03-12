@@ -22,6 +22,7 @@ import { Row, Col, Select, Divider, Card, Typography, Tag } from "antd";
 import "antd/dist/antd.css";
 import { CarOutlined } from "@ant-design/icons";
 import { convertCurrency } from "utils/price";
+import { uniq } from "lodash";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -32,6 +33,7 @@ export function Home({ dispatch, home }) {
 
   const { styles, products } = home;
   const [productsData, setProductsData] = useState(products);
+  const [deliveryTime, setDeliveryTime] = useState([]);
 
   useEffect(() => {
     dispatch(fetchDetail());
@@ -39,6 +41,7 @@ export function Home({ dispatch, home }) {
 
   useEffect(() => {
     setProductsData(products);
+    getDeliveryTime();
   }, [products]);
 
   function isEmpty(obj) {
@@ -72,6 +75,32 @@ export function Home({ dispatch, home }) {
     return str.slice(0, num) + "...";
   }
 
+  function sortingNumber(a, b) {
+    return a - b;
+  }
+
+  function getDeliveryTime() {
+    let days = [];
+    products.map(el => {
+      days.push(Number(el.delivery_time));
+    });
+
+    const uniqDays = uniq(days);
+    const sortedDays = uniqDays.sort(sortingNumber);
+
+    setDeliveryTime(sortedDays);
+  }
+
+  function handleDeliveryChange(value) {
+    if (value) {
+      const filteredDays = products.filter(el => {
+        return el.delivery_time.toString() === value.toString();
+      });
+      return setProductsData(filteredDays);
+    } else {
+      return setProductsData(products);
+    }
+  }
   return (
     <article>
       <Helmet>
@@ -112,16 +141,17 @@ export function Home({ dispatch, home }) {
             </Col>
             <Col span={12}>
               <Select
-                defaultValue="lucy"
+                placeholder="2 Hari"
                 style={{ width: "100%" }}
-                onChange={handleChange}
+                onChange={handleDeliveryChange}
+                allowClear
               >
-                <Option value="jack">Jack</Option>
-                <Option value="lucy">Lucy</Option>
-                <Option value="disabled" disabled>
-                  Disabled
-                </Option>
-                <Option value="Yiminghe">yiminghe</Option>
+                {products &&
+                  deliveryTime.map(d => (
+                    <Option value={d.toString()} key={d}>
+                      {d} Hari
+                    </Option>
+                  ))}
               </Select>
             </Col>
           </Row>
