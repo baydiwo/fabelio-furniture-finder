@@ -22,7 +22,7 @@ import { Row, Col, Select, Divider, Card, Typography, Tag, Input } from "antd";
 import "antd/dist/antd.css";
 import { CarOutlined } from "@ant-design/icons";
 import { convertCurrency } from "utils/price";
-import { uniq, includes } from "lodash";
+import { uniqBy, includes } from "lodash";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -37,6 +37,7 @@ export function Home({ dispatch, home }) {
   const [deliveryTime, setDeliveryTime] = useState([]);
   const [searchStyle, setSearchStyle] = useState([]);
   const [searchDeliveryTime, setsearchDeliveryTime] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     dispatch(fetchDetail());
@@ -48,14 +49,24 @@ export function Home({ dispatch, home }) {
   }, [products]);
 
   useEffect(() => {
-    if (searchStyle.length && searchDeliveryTime !== "") {
-      // dispatch(fetchSearchQueryData(products));
-      multipleSearch();
+    // if (searchStyle.length && searchDeliveryTime !== "") {
+    // dispatch(fetchSearchQueryData(products));
+    // multipleSearch();
+    // }
+    if (searchDeliveryTime) {
+      handleDeliveryChange(searchDeliveryTime);
     }
-  }, [searchStyle, searchDeliveryTime]);
+    if (searchStyle) {
+      handleChange(searchStyle);
+    }
+    if (search) {
+      handleSearch(search);
+    }
+  }, [searchStyle, searchDeliveryTime, search]);
 
   function multipleSearch() {
     console.log("multi");
+
     const findLastData = productsData.filter(function(element) {
       return (
         element.furniture_style.filter(function(cat) {
@@ -63,10 +74,12 @@ export function Home({ dispatch, home }) {
         }).length === searchStyle.length
       );
     });
+
     console.log(findLastData, "findLastData");
-    const filteredDays = productsData.filter(el => {
+    const filteredDays = findLastData.filter(el => {
       return el.delivery_time.toString() === searchDeliveryTime.toString();
     });
+
     console.log(filteredDays, "filteredDays");
     // if (searchStyle.length) {
     //   handleDeliveryChange(searchDeliveryTime);
@@ -90,7 +103,6 @@ export function Home({ dispatch, home }) {
         );
       });
       dispatch(fetchSearchQuery(value, searchDeliveryTime, filtered));
-      setSearchStyle(value);
       return setProductsData(filtered);
     } else {
       return setProductsData(products);
@@ -105,16 +117,23 @@ export function Home({ dispatch, home }) {
   }
 
   function sortingNumber(a, b) {
-    return a - b;
+    return a.id - b.id;
   }
 
   function getDeliveryTime() {
     let days = [];
     products.map(el => {
-      days.push(Number(el.delivery_time));
+      const numDeli = Number(el.delivery_time);
+      if (numDeli <= 7) {
+        days.push({ id: 1, label: "1 Week" });
+      } else if (numDeli >= 8 && numDeli <= 14) {
+        days.push({ id: 2, label: "2 Weeks" });
+      } else if (numDeli >= 28 && numDeli <= 31) {
+        days.push({ id: 3, label: "1 Month" });
+      }
     });
 
-    const uniqDays = uniq(days);
+    const uniqDays = uniqBy(days, "id");
     const sortedDays = uniqDays.sort(sortingNumber);
 
     setDeliveryTime(sortedDays);
@@ -123,10 +142,18 @@ export function Home({ dispatch, home }) {
   function handleDeliveryChange(value) {
     if (value) {
       const filteredDays = products.filter(el => {
-        return el.delivery_time.toString() === value.toString();
+        const numDeli = Number(el.delivery_time);
+        if (value == 1) {
+          return numDeli <= 7;
+        }
+        if (value == 2) {
+          return numDeli >= 8 && numDeli <= 14;
+        }
+        if (value == 3) {
+          return numDeli >= 28 && numDeli <= 31;
+        }
       });
       dispatch(fetchSearchQuery(searchStyle, value, filteredDays));
-      setsearchDeliveryTime(value);
       return setProductsData(filteredDays);
     } else {
       return setProductsData(products);
@@ -163,7 +190,7 @@ export function Home({ dispatch, home }) {
               <Search
                 placeholder="Search Furniture"
                 enterButton="Search"
-                onSearch={handleSearch}
+                onSearch={val => setSearch(val)}
               />
             </Col>
             <Col span={24}>
@@ -179,7 +206,7 @@ export function Home({ dispatch, home }) {
                 mode="multiple"
                 style={{ width: "100%" }}
                 placeholder="Classic, Midcentury"
-                onChange={handleChange}
+                onChange={val => setSearchStyle(val)}
               >
                 {styles &&
                   styles.map(item => (
@@ -193,15 +220,16 @@ export function Home({ dispatch, home }) {
               <Select
                 placeholder="2 Hari pengiriman"
                 style={{ width: "100%" }}
-                onChange={handleDeliveryChange}
+                onChange={val => setsearchDeliveryTime(val)}
                 allowClear
               >
                 {products &&
                   deliveryTime.map(d => (
-                    <Option value={d.toString()} key={d}>
-                      {d} Hari
+                    <Option value={d.id.toString()} key={d.id}>
+                      {d.label}
                     </Option>
                   ))}
+                <Option value="0">More</Option>
               </Select>
             </Col>
           </Row>
