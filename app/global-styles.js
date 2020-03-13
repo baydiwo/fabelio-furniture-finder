@@ -42,12 +42,15 @@ const GlobalStyle = createGlobalStyle`
     background: #ececec;
     padding: 16px;
   }
+  .product-style {
+    margin-top:8px;
+  }
   .product-style, .time {
     color: #0e6cc8;
   }
   .time {
+    margin-top:16px;
     font-weight: bold;
-    text-decoration: underline;
     text-align: right;
   }
   .description {

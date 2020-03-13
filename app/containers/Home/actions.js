@@ -9,7 +9,8 @@ import {
   FETCH_DETAIL,
   FETCH_DETAIL_SUCCESS,
   FETCH_DETAIL_ERROR,
-  SEARCH_QUERY
+  SEARCH_QUERY,
+  SEARCH_QUERY_DATA
 } from "./constants";
 
 export function defaultAction() {
@@ -39,11 +40,22 @@ export function fetchDetailError(error) {
   };
 }
 
-export function fetchSearchQuery(styleParam, deliveryTimeParam) {
-  console.log(styleParam, deliveryTimeParam, "query");
+export function fetchSearchQuery(
+  styleParam,
+  deliveryTimeParam,
+  filteredProducts
+) {
   return {
     type: SEARCH_QUERY,
     styleParam,
-    deliveryTimeParam
+    deliveryTimeParam,
+    filteredProducts
+  };
+}
+
+export function fetchSearchQueryData(products) {
+  return {
+    type: SEARCH_QUERY_DATA,
+    products
   };
 }
