@@ -6,8 +6,8 @@
   - [OS X / Linux:](#os-x--linux)
   - [Windows](#windows)
 - [Issue with local caching when running in production mode (F5 / ctrl+F5 / cmd+r weird behavior)](#issue-with-local-caching-when-running-in-production-mode-f5--ctrlf5--cmdr-weird-behavior)
-    - [Quick fix on your local browser:](#quick-fix-on-your-local-browser)
-    - [Full in-depth explanation](#full-in-depth-explanation)
+  - [Quick fix on your local browser:](#quick-fix-on-your-local-browser)
+  - [Full in-depth explanation](#full-in-depth-explanation)
 - [Local webfonts not working for development](#local-webfonts-not-working-for-development)
 - [Non-route containers](#non-route-containers)
   - [Where do I put the reducer?](#where-do-i-put-the-reducer)
@@ -110,7 +110,7 @@ output.publicPath in webpack.dev.babel.js, with protocol.
 // webpack.dev.babel.js
 
 output: {
-  publicPath: 'http://127.0.0.1:3000/',
+  publicPath: '/',
   /* … */
 },
 ```
@@ -198,8 +198,8 @@ const MyStyledComponent = styled.div`
 
 ```javascript
 // ContrivedExample.js
-import MyStyledComponent from './MyStyledComponent';
-import './styles.css';
+import MyStyledComponent from "./MyStyledComponent";
+import "./styles.css";
 
 const ContrivedExample = props => (
   <MyStyledComponent className="alert">{props.children}</MyStyledComponent>
@@ -244,7 +244,7 @@ This is a good choice if you are having issues with third-party styles
 
 ```javascript
 // Import bootstrap style (e.g. move this into the <head> of index.html)
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 ```
 
 **3) Change the position of `<GlobalStyle>` in the rendering of `<App>`**
