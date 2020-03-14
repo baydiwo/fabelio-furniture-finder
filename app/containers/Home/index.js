@@ -17,7 +17,7 @@ import makeSelectHome from "./selectors";
 import reducer from "./reducer";
 import saga from "./saga";
 import messages from "./messages";
-import { fetchDetail, fetchSearchQuery, fetchSearchQueryData } from "./actions";
+import { fetchDetail } from "./actions";
 import { Row, Col, Select, Divider, Card, Typography, Tag, Input } from "antd";
 import "antd/dist/antd.css";
 import { CarOutlined } from "@ant-design/icons";
@@ -51,34 +51,12 @@ export function Home({ dispatch, home }) {
   useEffect(() => {
     if (searchDeliveryTime) {
       handleDeliveryChange(searchDeliveryTime);
-    }
-    if (searchStyle.length) {
+    } else if (searchStyle.length) {
       handleChange(searchStyle);
-    }
-    if (search) {
+    } else if (search) {
       handleSearch(search);
     }
-    if (search && searchStyle.length) {
-      multipleSearch();
-    }
   }, [searchStyle, searchDeliveryTime, search]);
-
-  async function multipleSearch() {
-    // const a = filterSearch(products, search);
-
-    // const ba = filterStyle(a, searchDeliveryTime);
-    // console.log(ba);
-
-    // filterSearch(products, search).then(result => {
-    //   console.log(result);
-    //   return filterStyle(result, searchDeliveryTime);
-    // });
-
-    const a = filterSearch(products, search);
-
-    const b = setTimeout(filterStyle(a, searchDeliveryTime), 3);
-    console.log(a, b);
-  }
 
   function filterSearch(data, selector) {
     let res = [];
@@ -125,13 +103,13 @@ export function Home({ dispatch, home }) {
 
   function handleChange(value) {
     if (!isEmpty(value)) {
-      dispatch(
-        fetchSearchQuery(
-          value,
-          searchDeliveryTime,
-          filterStyle(products, value)
-        )
-      );
+      // dispatch(
+      //   fetchSearchQuery(
+      //     value,
+      //     searchDeliveryTime,
+      //     filterStyle(products, value)
+      //   )
+      // );
       return setProductsData(filterStyle(products, value));
     } else {
       return setProductsData(products);
@@ -169,12 +147,14 @@ export function Home({ dispatch, home }) {
   }
 
   function handleDeliveryChange(value) {
+    console.log(value);
     if (value) {
-      dispatch(
-        fetchSearchQuery(searchStyle, value, filterDelivery(products, value))
-      );
+      // dispatch(
+      //   fetchSearchQuery(searchStyle, value, filterDelivery(products, value))
+      // );
       return setProductsData(filterDelivery(products, value));
     } else {
+      setsearchDeliveryTime("");
       return setProductsData(products);
     }
   }
@@ -293,7 +273,6 @@ export function Home({ dispatch, home }) {
           </Row>
         </div>
         {/* end of card */}
-        {/* <ReposList {...reposListProps} /> */}
       </div>
     </article>
   );
