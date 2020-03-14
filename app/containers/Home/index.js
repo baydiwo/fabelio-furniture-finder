@@ -49,41 +49,71 @@ export function Home({ dispatch, home }) {
   }, [products]);
 
   useEffect(() => {
-    // if (searchStyle.length && searchDeliveryTime !== "") {
-    // dispatch(fetchSearchQueryData(products));
-    // multipleSearch();
-    // }
     if (searchDeliveryTime) {
       handleDeliveryChange(searchDeliveryTime);
     }
-    if (searchStyle) {
+    if (searchStyle.length) {
       handleChange(searchStyle);
     }
     if (search) {
       handleSearch(search);
     }
+    if (search && searchStyle.length) {
+      multipleSearch();
+    }
   }, [searchStyle, searchDeliveryTime, search]);
 
-  function multipleSearch() {
-    console.log("multi");
+  async function multipleSearch() {
+    // const a = filterSearch(products, search);
 
-    const findLastData = productsData.filter(function(element) {
+    // const ba = filterStyle(a, searchDeliveryTime);
+    // console.log(ba);
+
+    // filterSearch(products, search).then(result => {
+    //   console.log(result);
+    //   return filterStyle(result, searchDeliveryTime);
+    // });
+
+    const a = filterSearch(products, search);
+
+    const b = setTimeout(filterStyle(a, searchDeliveryTime), 3);
+    console.log(a, b);
+  }
+
+  function filterSearch(data, selector) {
+    let res = [];
+    data.map(el => {
+      if (includes(el.name.toLowerCase(), selector.toLowerCase())) {
+        return res.push(el);
+      }
+    });
+    return res;
+  }
+
+  function filterDelivery(data, selector) {
+    return data.filter(el => {
+      const numDeli = Number(el.delivery_time);
+      if (selector == 1) {
+        return numDeli <= 7;
+      }
+      if (selector == 2) {
+        return numDeli >= 8 && numDeli <= 14;
+      }
+      if (selector == 3) {
+        return numDeli >= 28 && numDeli <= 31;
+      }
+    });
+  }
+
+  function filterStyle(data, selector) {
+    console.log(data, "data");
+    return data.filter(function(element) {
       return (
         element.furniture_style.filter(function(cat) {
-          return searchStyle.indexOf(cat) > -1;
-        }).length === searchStyle.length
+          return selector.indexOf(cat) > -1;
+        }).length === selector.length
       );
     });
-
-    console.log(findLastData, "findLastData");
-    const filteredDays = findLastData.filter(el => {
-      return el.delivery_time.toString() === searchDeliveryTime.toString();
-    });
-
-    console.log(filteredDays, "filteredDays");
-    // if (searchStyle.length) {
-    //   handleDeliveryChange(searchDeliveryTime);
-    // }
   }
 
   function isEmpty(obj) {
@@ -95,15 +125,14 @@ export function Home({ dispatch, home }) {
 
   function handleChange(value) {
     if (!isEmpty(value)) {
-      const filtered = products.filter(function(element) {
-        return (
-          element.furniture_style.filter(function(cat) {
-            return value.indexOf(cat) > -1;
-          }).length === value.length
-        );
-      });
-      dispatch(fetchSearchQuery(value, searchDeliveryTime, filtered));
-      return setProductsData(filtered);
+      dispatch(
+        fetchSearchQuery(
+          value,
+          searchDeliveryTime,
+          filterStyle(products, value)
+        )
+      );
+      return setProductsData(filterStyle(products, value));
     } else {
       return setProductsData(products);
     }
@@ -141,34 +170,18 @@ export function Home({ dispatch, home }) {
 
   function handleDeliveryChange(value) {
     if (value) {
-      const filteredDays = products.filter(el => {
-        const numDeli = Number(el.delivery_time);
-        if (value == 1) {
-          return numDeli <= 7;
-        }
-        if (value == 2) {
-          return numDeli >= 8 && numDeli <= 14;
-        }
-        if (value == 3) {
-          return numDeli >= 28 && numDeli <= 31;
-        }
-      });
-      dispatch(fetchSearchQuery(searchStyle, value, filteredDays));
-      return setProductsData(filteredDays);
+      dispatch(
+        fetchSearchQuery(searchStyle, value, filterDelivery(products, value))
+      );
+      return setProductsData(filterDelivery(products, value));
     } else {
       return setProductsData(products);
     }
   }
 
   function handleSearch(value) {
-    let res = [];
     if (value) {
-      products.map(el => {
-        if (includes(el.name.toLowerCase(), value.toLowerCase())) {
-          return res.push(el);
-        }
-      });
-      return setProductsData(res);
+      return setProductsData(filterSearch(products, value));
     } else {
       return setProductsData(products);
     }
