@@ -12,6 +12,7 @@
   },
   "author": "Max Stoiber",
   "license": "MIT",
+  "homepage": "https://baydiwo.github.io/fabelio-furniture-finder/",
   "scripts": {
     "analyze:clean": "rimraf stats.json",
     "preanalyze": "npm run analyze:clean",
@@ -42,7 +43,9 @@
     "test": "cross-env NODE_ENV=test jest --coverage",
     "test:watch": "cross-env NODE_ENV=test jest --watchAll",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "prettify": "prettier --write"
+    "prettify": "prettier --write",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d docs -b master"
   },
   "browserslist": [
     "last 2 versions",
